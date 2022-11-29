@@ -11,7 +11,7 @@ class App(tk.Tk):
         self.title('Hand Gestures data colector')
         self.protocol("WM_DELETE_WINDOW", self.destroy)
 
-        model = DataColectorModel([], 'LeftClick', 5, 'C:/')
+        model = DataColectorModel([], 'None', 5, 'C:/')
 
         view = DataColectorView(self)
         view.pack(side="left")
