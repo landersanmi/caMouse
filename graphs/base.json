@@ -1,0 +1,26 @@
+{
+    "number_of_nodes": 13,
+    "recursive_nodes" : [1, 2,3,4,5,6,7,8,9,11,12],
+    "connections" : [
+        [0, 1, 1, "Base -> Left Click 0"],
+        [1, 2, 2, "Left Click 0 -> Left Click 1"],
+        [2, 3, 3, "Left Click 1 -> Left Click 2"],
+        [0, 4, 4, "Base -> Right Click 0"],
+        [4, 5, 5, "Right Click 0 -> Right Click 1"],
+        [5, 6, 6, "Right Click 1 -> Right Click 2"],
+        [0, 7, 7, "Base -> Zoom In"],
+        [0, 8, 8, "Base -> Zoom Out"],
+        [0, 9, 9, "Base -> Tab_0"],
+        [9, 10, 10, "Tab_0 -> Tab_1"],
+        [0, 11, 11, "Base -> Scroll_up"],
+        [0, 12, 12, "Base -> Scroll_down"]
+    ],
+    "info":[
+        [1, "moveable", true],
+        [2, "moveable", true],
+        [3, "moveable", true],
+        [4, "moveable", true],
+        [5, "moveable", true],
+        [6, "moveable", true]
+    ]
+  }

@@ -1,0 +1,9 @@
+{
+  "number_of_nodes": 4,
+  "recursive_nodes" : [1, 2, 3],
+  "connections" : [
+    [0,1, 0, ""],
+    [1,2, 1, ""],
+    [2,3, 2, ""]
+  ]
+}
