@@ -6,6 +6,7 @@ import time
 import numpy as np
 from tkinter import filedialog
 import pandas as pd
+import random
 
 class DataColectorController:
     
@@ -34,7 +35,9 @@ class DataColectorController:
             if len(landmarks_coordinates) != 0: 
                 self.set_hand_label_image(black_frame, getattr(self.view, 'hand{}_lbl'.format(i)))
                 gesture = self.view.gesture_var.get()
-                if self.model.is_recording: self.model.add_gesture_series(landmarks_coordinates, gesture)
+
+                if self.model.is_recording and random.rand()< 0.03: 
+                    self.model.add_gesture_series(landmarks_coordinates, gesture)
         
         self.model.frames = frames
 

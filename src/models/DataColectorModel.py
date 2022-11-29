@@ -5,6 +5,11 @@ import mediapipe as mp
 
 NUM_HAND_LANDMARKS = 21
 
+GESTURES = ['RightIndexExtended', 'RightIndexHook', 'RightIndexClosed',
+            'LeftIndexExtended', 'LeftIndexHook', 'LeftIndexClosed', 
+            'PinchIn', 'PinchOut', 'ThumbUp', 'ThumbDown',
+            'ExtendedHandStart', 'ExtendedHandEnd', 'None']
+
 class DataColectorModel:
     def __init__(self, cam_ids, selected_gesture, record_time, save_dir):   
         cameras = []
@@ -50,7 +55,7 @@ class DataColectorModel:
         return self.__selected_gesture
     @selected_gesture.setter
     def selected_gesture(self, selected_gesture):
-        if selected_gesture in ('MouseMove', 'LeftClick', 'RightClick', 'Zoom', 'None'):
+        if selected_gesture in GESTURES:
             self.__selected_gesture = selected_gesture
         else:
             raise ValueError(f'Invalid gesture: {selected_gesture}')
