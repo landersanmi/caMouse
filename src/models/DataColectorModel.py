@@ -4,7 +4,6 @@ import pandas as pd
 import mediapipe as mp
 
 NUM_HAND_LANDMARKS = 21
-
 GESTURES = ['RightIndexExtended', 'RightIndexHook', 'RightIndexClosed',
             'LeftIndexExtended', 'LeftIndexHook', 'LeftIndexClosed', 
             'PinchIn', 'PinchOut', 'ThumbUp', 'ThumbDown',
@@ -40,6 +39,7 @@ class DataColectorModel:
         self.mpHands = mp.solutions.hands
         self.mpDraw = mp.solutions.drawing_utils  
         self.is_recording = False
+        self.gesture_types = GESTURES
         self.gestures_df = pd.DataFrame(columns=columnames)
 
     

@@ -13,11 +13,19 @@ class App(tk.Tk):
 
         model = DataColectorModel([], 'None', 5, 'C:/')
 
+        self.geometry("2500x1380")
+        self.resizable(0, 0)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=7)
+        
         view = DataColectorView(self)
-        view.pack(side="left")
+        #view.pack(side="left")
 
         controller = DataColectorController(model, view)
         view.set_controller(controller)
+        
+        for _ in range(controller.get_cam_count()):
+            view.add_cam_frame()   
         
         camera_thread = threading.Thread(target=view.update_cameras_loop)
         camera_thread.start()
@@ -25,3 +33,4 @@ class App(tk.Tk):
 if __name__ == '__main__':
     app = App()
     app.mainloop()   
+    app.destroy()

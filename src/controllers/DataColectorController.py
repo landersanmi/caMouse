@@ -13,6 +13,7 @@ class DataColectorController:
     def __init__(self, model, view):
         self.model = model
         self.view = view
+        self.load_gesture_names_combo()
  
     def update_frames(self):
         frames = []
@@ -30,10 +31,11 @@ class DataColectorController:
             for coordinates in landmarks_coordinates: cv2.circle(black_frame, (coordinates[0], coordinates[1]), 2, (255,0,0), -1)
             
             frames.append(frame)
-            self.set_camera_label_image(frame, getattr(self.view, 'cam{}_lbl'.format(i)))
+            if self.view.cam_lbls is not None and len(self.view.cam_lbls) >= i+1:
+                self.set_camera_label_image(frame, self.view.cam_lbls[i])
             
             if len(landmarks_coordinates) != 0: 
-                self.set_hand_label_image(black_frame, getattr(self.view, 'hand{}_lbl'.format(i)))
+                self.set_hand_label_image(black_frame, self.view.hand_lbls[i])
                 gesture = self.view.gesture_var.get()
 
                 if self.model.is_recording and random.rand()< 0.03: 
@@ -89,7 +91,14 @@ class DataColectorController:
         if camera != None:
             s = self.model.cameras.append(camera)
             self.model.update_hands()
+            return True
+        return False
 
+    def get_cam_count(self):
+        return len(self.model.cameras)
+
+    def load_gesture_names_combo(self):
+        self.view.set_gestures(self.model.gesture_types)
 
     def select_dir(self):
         folder_selected = filedialog.askdirectory()
