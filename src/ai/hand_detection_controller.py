@@ -3,9 +3,9 @@ from graph.graph import ActionGraph
 from mouse.mouse_controler import MouseController
 
 class HandDetectionController:
-    def __init__(self) -> None:
+    def __init__(self, model = None) -> None:
         self.action_graph = ActionGraph("base")
-        self.model = None
+        self.model = model
 
         self.mouse = MouseController()
 
