@@ -11,6 +11,21 @@ import logging
 
 from ai.distance_based_classifier import DistanceBasedClassifier
 
+
+def rotation_matrix_from_vectors(vec1, vec2):
+    """ Find the rotation matrix that aligns vec1 to vec2
+    :param vec1: A 3d "source" vector
+    :param vec2: A 3d "destination" vector
+    :return mat: A transform matrix (3x3) which when applied to vec1, aligns it with vec2.
+    """
+    a, b = (vec1 / np.linalg.norm(vec1)).reshape(3), (vec2 / np.linalg.norm(vec2)).reshape(3)
+    v = np.cross(a, b)
+    c = np.dot(a, b)
+    s = np.linalg.norm(v)
+    kmat = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
+    rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) * ((1 - c) / (s ** 2))
+    return rotation_matrix
+
 class DataCheckController:
     def __init__(self, model, view, use_camera = True):
         self.model = model
@@ -92,25 +107,57 @@ class DataCheckController:
         x , y, c = frame.shape
 
         landmarks=[]
-        landmarks_raw = []
-        dots = np.empty((0,2), int)
+        dots = np.empty((0,3), int)
 
         if result.multi_hand_landmarks:
             for handslms in result.multi_hand_landmarks:
                 for i, lm in enumerate(handslms.landmark):
-                    lmx, lmy = int(lm.x * x), int(lm.y * y)
-                    dots = np.append(dots, [[lmx, lmy]] , axis=0)
-                    landmarks_raw.append([lm.x, lm.y, lm.z])
+                    dots = np.append(dots, [[lm.x, lm.y, lm.z]] , axis=0)
                 
-                dots_relocated = dots - dots.min(axis=0)
+                dots_relocated = dots[0]-dots 
 
+                # Rotate to certain position
+                q = rotation_matrix_from_vectors(np.array((0,1,0)), np.array(dots_relocated[5]))
+                
+                new_dots = [np.array((0,0,0))]
+                for dot in dots_relocated[1:]:
+                    new_dots += [np.array(dot).dot(q)]
+
+                custom_dot = np.array((new_dots[17][0],0,new_dots[17][2]))
+                q2 = rotation_matrix_from_vectors(np.array((np.linalg.norm(custom_dot),0,0)), custom_dot)
+                
+                new_dots2 = [np.array((0,0,0)), new_dots[1]]
+                for dot in new_dots[2:]:
+                    new_dots2 += [np.array(dot).dot(q2)]
+                  
+                for dot in new_dots2:
+                    dot[2] = 0.0
+                    
+                y_scale = new_dots2[5][1]
+                for dot in new_dots2:
+                    dot[1] /= y_scale
+                    
+                x_scale = new_dots2[17][0]
+                for dot in new_dots2:
+                    dot[0] /= x_scale
+                
+                
                 self.model.hand_pre_cords = np.copy(self.model.hand_cords)
 
-                self.model.hand_cords = dots
-                self.model.hand_normalized_cords = dots_relocated
+                self.model.hand_cords = np.array(new_dots2)
+                #self.model.hand_normalized_cords = dots_relocated
 
 
                 self.mpDraw.draw_landmarks(frame, handslms, self.mpHands.HAND_CONNECTIONS)
+                
+                cv2.circle(frame, (int(200+new_dots2[0][0]*40), int(200+40*new_dots2[0][1])), 1, (255,255,0),2)
+                cv2.circle(frame, (int(200+new_dots2[5][0]*40), int(200+40*new_dots2[5][1])), 1, (255,0,255),2)
+                cv2.circle(frame, (int(200+new_dots2[17][0]*40), int(200+40*new_dots2[17][1])), 1, (255,127, 127),2)
+                for i, dot in enumerate(new_dots2):
+                    if i in [0, 5, 17]:
+                        continue
+                    cv2.circle(frame, (int(200+dot[0]*40), int(200+40*dot[1])), 1, (255,0,0),2)
+                    
 
         self.model.frame = frame
 
@@ -126,6 +173,3 @@ class DataCheckController:
         """
         # save the model
         self.model.frame = frame
-
-        # show a success message
-        self.view.show_success(f'The frame was loaded!')
