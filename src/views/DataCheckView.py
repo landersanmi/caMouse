@@ -4,7 +4,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 import numpy as np
 
-from models.DataColectorModel import GESTURES
+from models.DataCollectorModel import GESTURES
 
 
 class DataCheckView(ttk.Frame):

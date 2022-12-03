@@ -1,7 +1,7 @@
 import cv2
-import os
 import pandas as pd
 import mediapipe as mp
+import os
 
 NUM_HAND_LANDMARKS = 21
 GESTURES = ['RightIndexExtended', 'RightIndexHook', 'RightIndexClosed',
@@ -9,7 +9,7 @@ GESTURES = ['RightIndexExtended', 'RightIndexHook', 'RightIndexClosed',
             'PinchIn', 'PinchOut', 'ThumbUp', 'ThumbDown',
             'ExtendedHandStart', 'ExtendedHandEnd', 'None']
 
-class DataColectorModel:
+class DataCollectorModel:
     def __init__(self, cam_ids, selected_gesture, record_time, save_dir):   
         cameras = []
         for id in cam_ids:
@@ -28,6 +28,7 @@ class DataColectorModel:
         for i in range(NUM_HAND_LANDMARKS):
             columnames.append("x{}".format(i))
             columnames.append("y{}".format(i)) 
+            columnames.append("z{}".format(i))
         columnames.append("gesture")
         
         self.cameras = cameras
@@ -99,6 +100,7 @@ class DataColectorModel:
         for dot in dots:
             data.append(dot[0])
             data.append(dot[1])
+            data.append(dot[2])
         data.append(gesture)
        
         df_row = pd.Series(data=data, index=self.gestures_df.columns)

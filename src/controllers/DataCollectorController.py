@@ -7,13 +7,16 @@ import numpy as np
 from tkinter import filedialog
 import pandas as pd
 import random
+import pickle
 
-class DataColectorController:
+class DataCollectorController:
     
     def __init__(self, model, view):
         self.model = model
         self.view = view
+        self.visualization_frame = self.view.visualization_frame
         self.load_gesture_names_combo()
+        self.knn_model = pickle.load(open('../models/knn.pkl', 'rb'))
  
     def update_frames(self):
         frames = []
@@ -23,23 +26,33 @@ class DataColectorController:
                 frame = cv2.resize(frame, (int(frame.shape[1]*0.5), int(frame.shape[0]*0.5)), interpolation = cv2.INTER_AREA)
             
             frame = cv2.flip(frame, 1)
-            frame, landmarks_coordinates = self.get_drawed_hand_frame(frame, self.model.hands[i])
+            frame, landmarks_coordinates, landmarks_raw = self.get_drawed_hand_frame(frame, self.model.hands[i])
             rect = cv2.boundingRect(landmarks_coordinates)
             _, _, w, h = rect
             black_frame = np.zeros((h,w), dtype=int)
+            data=[]
+            for landmarks in landmarks_raw: 
+                data.append(landmarks[0])
+                data.append(landmarks[1])
+                data.append(landmarks[2])
+
+            for coordinates in landmarks_coordinates:
+                cv2.circle(black_frame, (coordinates[0], coordinates[1]), 2, (255,0,0), -1)
+
             
-            for coordinates in landmarks_coordinates: cv2.circle(black_frame, (coordinates[0], coordinates[1]), 2, (255,0,0), -1)
-            
+            if len(data) > 0:
+                predicted_gesture = self.knn_model.predict(np.asarray(data).reshape(1, -1))[0]
+                cv2.putText(frame, str(predicted_gesture), (0,40), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,255,255))
             frames.append(frame)
-            if self.view.cam_lbls is not None and len(self.view.cam_lbls) >= i+1:
-                self.set_camera_label_image(frame, self.view.cam_lbls[i])
+            if self.visualization_frame.camera_frames is not None and len(self.visualization_frame.camera_frames) >= i+1:
+                self.set_camera_label_image(frame, self.visualization_frame.camera_frames[i].cam_lbl)
             
             if len(landmarks_coordinates) != 0: 
-                self.set_hand_label_image(black_frame, self.view.hand_lbls[i])
-                gesture = self.view.gesture_var.get()
+                self.set_hand_label_image(black_frame, self.visualization_frame.camera_frames[i].hand_lbl)
+                gesture = self.view.config_frame.gesture_var.get()
 
-                if self.model.is_recording and random.rand()< 0.03: 
-                    self.model.add_gesture_series(landmarks_coordinates, gesture)
+                if self.model.is_recording and random.random()< 0.05: 
+                    self.model.add_gesture_series(landmarks_raw, gesture)
         
         self.model.frames = frames
 
@@ -67,7 +80,7 @@ class DataColectorController:
         if result.multi_hand_landmarks:
             for handslms in result.multi_hand_landmarks:
                 for lm in handslms.landmark:
-                    lmx, lmy = int(lm.x * x), int(lm.y * y)
+                    lmx, lmy, lmz = int(lm.x * x), int(lm.y * y), int(lm.z * c)
                     cv2.circle(frame, (lmx, lmy), 3, (255,0,0), -1)
                     landmarks_coordinates = np.append(landmarks_coordinates, [[lmx, lmy]] , axis=0)
                     landmarks_raw.append([lm.x, lm.y, lm.z])
@@ -79,13 +92,13 @@ class DataColectorController:
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
                 self.model.mpDraw.draw_landmarks(frame, handslms, self.model.mpHands.HAND_CONNECTIONS)
         
-        return frame, landmarks_coordinates_normalized
+        return frame, landmarks_coordinates_normalized, landmarks_raw
 
     def add_cam(self):
         try:
-            camera_id = int(self.view.cam_id_var.get())
+            camera_id = int(self.view.config_frame.cam_id_var.get())
         except:
-            camera_id = str(self.view.cam_id_var.get())
+            camera_id = str(self.view.config_frame.cam_id_var.get())
 
         camera = cv2.VideoCapture(camera_id)
         if camera != None:
@@ -93,6 +106,9 @@ class DataColectorController:
             self.model.update_hands()
             return True
         return False
+    
+    def add_cam_frame(self):
+        self.view.add_cam_frame()
 
     def get_cam_count(self):
         return len(self.model.cameras)
@@ -102,21 +118,21 @@ class DataColectorController:
 
     def select_dir(self):
         folder_selected = filedialog.askdirectory()
-        self.view.dir_var.set(folder_selected)
+        self.view.config_frame.dir_var.set(folder_selected)
 
 
     def update_secs(self):
-        self.model.record_time = int(self.view.secs_var)
+        self.model.record_time = int(self.config_frame.secs_var)
 
 
     def record_data(self):
         self.model.is_recording = True
-        time.sleep(int(self.view.secs_var.get()))
+        time.sleep(int(self.view.config_frame.secs_var.get()))
         self.model.is_recording = False
         print(self.model.gestures_df)
 
 
     def save_data(self):
-        path = self.view.dir_var.get() + '/'
+        path = self.view.config_frame.dir_var.get() + '/'
         filename = str(datetime.timestamp(datetime.now())) + '.csv'
         self.model.gestures_df.to_csv(path + filename)
