@@ -9,6 +9,12 @@ import pandas as pd
 import random
 import pickle
 
+
+
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+
 class DataCollectorController:
     
     def __init__(self, model, view):
@@ -16,7 +22,8 @@ class DataCollectorController:
         self.view = view
         self.visualization_frame = self.view.visualization_frame
         self.load_gesture_names_combo()
-        self.knn_model = pickle.load(open('../models/knn.pkl', 'rb'))
+        self.knn_model = pickle.load(open(self.model.test_model_dir, 'rb'))
+        matplotlib.use("Agg")
  
     def update_frames(self):
         frames = []
@@ -26,35 +33,47 @@ class DataCollectorController:
                 frame = cv2.resize(frame, (int(frame.shape[1]*0.5), int(frame.shape[0]*0.5)), interpolation = cv2.INTER_AREA)
             
             frame = cv2.flip(frame, 1)
-            frame, landmarks_coordinates, landmarks_raw = self.get_drawed_hand_frame(frame, self.model.hands[i])
-            rect = cv2.boundingRect(landmarks_coordinates)
-            _, _, w, h = rect
-            black_frame = np.zeros((h,w), dtype=int)
-            data=[]
-            for landmarks in landmarks_raw: 
-                data.append(landmarks[0])
-                data.append(landmarks[1])
-                data.append(landmarks[2])
+            frame, landmarks_normalized, landmarks_raw = self.get_drawed_hand_frame(frame, self.model.hands[i])
 
-            for coordinates in landmarks_coordinates:
-                cv2.circle(black_frame, (coordinates[0], coordinates[1]), 2, (255,0,0), -1)
+            model_data = []
+            x, y, z = [], [], []
+            for lm in landmarks_normalized:
+                x.append(lm[0])
+                y.append(lm[1])
+                z.append(lm[2])
+                model_data.append(lm[0])
+                model_data.append(lm[1])
+                model_data.append(lm[2])
 
-            
-            if len(data) > 0:
-                predicted_gesture = self.knn_model.predict(np.asarray(data).reshape(1, -1))[0]
-                cv2.putText(frame, str(predicted_gesture), (0,40), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,255,255))
+            if len(model_data) > 0 and self.view.config_frame.test_mode_var.get() == 1:
+                model_data = np.asarray(model_data).reshape(1, -1)
+                predict_df = pd.DataFrame(data = model_data, columns=self.model.columnames[:-1])
+                predicted_gesture = self.knn_model.predict(predict_df)[0]
+                cv2.putText(frame, str(predicted_gesture), (0,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255))
             frames.append(frame)
             if self.visualization_frame.camera_frames is not None and len(self.visualization_frame.camera_frames) >= i+1:
                 self.set_camera_label_image(frame, self.visualization_frame.camera_frames[i].cam_lbl)
             
-            if len(landmarks_coordinates) != 0: 
-                self.set_hand_label_image(black_frame, self.visualization_frame.camera_frames[i].hand_lbl)
+            if len(landmarks_normalized) != 0: 
+                plot = self.generate_3D_plot(x, y, z)
+                self.set_hand_label_image(plot, self.visualization_frame.camera_frames[i].hand_lbl)
                 gesture = self.view.config_frame.gesture_var.get()
 
-                if self.model.is_recording and random.random()< 0.05: 
+                if self.model.is_recording and random.random()< 0.4: 
                     self.model.add_gesture_series(landmarks_raw, gesture)
         
         self.model.frames = frames
+
+    def generate_3D_plot(self, x, y, z):
+        plt.close('all')
+        fig = plt.figure(figsize=(4, 3), dpi=50)
+        canvas = FigureCanvasAgg(fig)
+        ax = plt.axes(projection='3d')
+        ax.scatter3D(x, y, z)
+        canvas.draw()
+        buf = canvas.buffer_rgba()
+        plot = np.asarray(buf)
+        return plot
 
     def set_hand_label_image(self, image, lbl):
         tk_hand_mage = ImageTk.PhotoImage(Image.fromarray(image))
@@ -68,31 +87,26 @@ class DataCollectorController:
         lbl.configure(image=image)
         lbl.image = image
     
-
     def get_drawed_hand_frame(self, frame, hand):
         x , y, c = frame.shape
         framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         result = hand.process(framergb)
 
         landmarks_raw = []
-        landmarks_coordinates = np.empty((0,2), int)
-        landmarks_coordinates_normalized = np.empty((0,2), int)
+        landmarks_coordinates = np.empty((0,3), int)
+        landmarks_coordinates_normalized = np.empty((0,3), int)
         if result.multi_hand_landmarks:
             for handslms in result.multi_hand_landmarks:
                 for lm in handslms.landmark:
                     lmx, lmy, lmz = int(lm.x * x), int(lm.y * y), int(lm.z * c)
-                    cv2.circle(frame, (lmx, lmy), 3, (255,0,0), -1)
-                    landmarks_coordinates = np.append(landmarks_coordinates, [[lmx, lmy]] , axis=0)
+                    landmarks_coordinates = np.append(landmarks_coordinates, [[lmx, lmy, lmz]] , axis=0)
                     landmarks_raw.append([lm.x, lm.y, lm.z])
                 
                 landmarks_coordinates_normalized = landmarks_coordinates - landmarks_coordinates.min(axis=0)
-                #for dot in dots_relocated: cv2.circle(frame, (dot[0], dot[1]), 3, (0,0,255), -1)
-                rect = cv2.boundingRect(landmarks_coordinates)
-                x, y, w, h = rect
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
                 self.model.mpDraw.draw_landmarks(frame, handslms, self.model.mpHands.HAND_CONNECTIONS)
         
         return frame, landmarks_coordinates_normalized, landmarks_raw
+
 
     def add_cam(self):
         try:
@@ -120,6 +134,11 @@ class DataCollectorController:
         folder_selected = filedialog.askdirectory()
         self.view.config_frame.dir_var.set(folder_selected)
 
+    def select_model(self):
+        file_selected = filedialog.askopenfilename(title="Select model file...", filetypes=[('pickle files', '.pkl')])
+        self.model.test_model_dir = file_selected
+        self.knn_model = pickle.load(open(file_selected, 'rb'))
+        self.view.config_frame.model_dir_var.set(file_selected)
 
     def update_secs(self):
         self.model.record_time = int(self.config_frame.secs_var)
@@ -130,7 +149,6 @@ class DataCollectorController:
         time.sleep(int(self.view.config_frame.secs_var.get()))
         self.model.is_recording = False
         print(self.model.gestures_df)
-
 
     def save_data(self):
         path = self.view.config_frame.dir_var.get() + '/'

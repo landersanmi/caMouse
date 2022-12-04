@@ -15,7 +15,7 @@ class DataCollectorView(ttk.Frame):
         self.config_frame.pack(side=tk.LEFT)
         self.visualization_frame = VisualizationFrame(self.upper_frame, self.controller)
         self.visualization_frame.pack(side=tk.RIGHT)
-        self.upper_frame.pack(side=tk.TOP, expand=True, fill=tk.BOTH, pady=10)# fill=tk.BOTH)
+        self.upper_frame.pack(side=tk.TOP, expand=True, fill=tk.BOTH, pady=10)
 
         self.bottom_frame = ttk.Frame(parent)
         self.btns_frame = ttk.Frame(self.bottom_frame)
@@ -88,6 +88,25 @@ class ConfigFrame(ttk.Frame):
         ttk.Button(self.config_dir_frame, text="Open directory selector", command=self.on_select_dir_btn).pack(side=tk.RIGHT, padx=10)
         self.config_dir_frame.pack(side=tk.TOP, padx=10, pady=10, fill=tk.X)
 
+        # TEST MODEL
+        self.config_test_mode_frame = ttk.LabelFrame(self, text="Testing model options")
+        
+        self.model_dir_frame = ttk.Frame(self.config_test_mode_frame)
+        ttk.Label(self.model_dir_frame, text="Model file:").pack(side=tk.LEFT, padx=10)
+        self.model_dir_var = tk.StringVar()
+        ttk.Entry(self.model_dir_frame, textvariable=self.model_dir_var).pack(side=tk.LEFT, pady=10)
+        ttk.Button(self.model_dir_frame, text="Open file selector", command=self.on_select_model_btn).pack(side=tk.RIGHT, padx=10)
+        self.model_dir_frame.pack(side=tk.TOP, fill=tk.X)
+
+        self.test_mode_frame = ttk.Frame(self.config_test_mode_frame)
+        self.test_mode_var = tk.IntVar(value=2)
+        ttk.Label(self.test_mode_frame, text="Test mode:").pack(side=tk.LEFT, padx=10)
+        ttk.Radiobutton(self.test_mode_frame, text="Yes", variable=self.test_mode_var, value=1).pack(side=tk.LEFT, padx=10)
+        ttk.Radiobutton(self.test_mode_frame, text="No", variable=self.test_mode_var, value=2).pack(side=tk.LEFT, padx=10)
+        self.test_mode_frame.pack(side=tk.TOP, fill=tk.X)
+
+        self.config_test_mode_frame.pack(side=tk.TOP, padx=10, pady=10, fill=tk.X)
+
         self.controller = controller
     
     def on_add_cam_btn(self):
@@ -98,6 +117,10 @@ class ConfigFrame(ttk.Frame):
     def on_select_dir_btn(self):
         if self.controller:
             self.controller.select_dir()
+    
+    def on_select_model_btn(self):
+        if self.controller:
+            self.controller.select_model()
 
     def on_secs_txt_change(self):
         if self.controller:
