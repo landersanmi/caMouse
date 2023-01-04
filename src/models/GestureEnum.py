@@ -1,0 +1,16 @@
+from enum import Enum
+
+class Gesture(Enum):
+    RIGHT_INDEX_EXTENDED = 0
+    RIGHT_INDEX_HOOK = 1
+    RIGHT_INDEX_CLOSED = 2
+    LEFT_INDEX_EXTENDED = 3
+    LEFT_INDEX_HOOK = 4
+    LEFT_INDEX_CLOSED = 5
+    PINCH_IN = 6
+    PINCH_OUT = 7
+    THUMB_UP = 8
+    THUMB_DOWN = 9
+    EXTENDED_HAND_START = 10
+    EXTENDED_HAND_END = 11
+    NONE = 12

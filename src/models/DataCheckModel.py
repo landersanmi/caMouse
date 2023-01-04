@@ -2,6 +2,10 @@ import numpy as np
 
 import pandas as pd
 
+from os.path import exists
+
+from models.GestureEnum import Gesture
+
 class DataCheckModel:
     
 
@@ -74,7 +78,7 @@ class DataCheckModel:
     def hand_dataset(self, value):
         self.hand_dataset = value
 
-    def __init__(self, db = None):
+    def __init__(self, db = "data/hand_dataset.csv"):
         self._frame = None
         self._frame_masked = None
         self._status = None
@@ -94,10 +98,17 @@ class DataCheckModel:
         list_coords = [self._gesture]
         list_coords += [p for pair in self._hand_cords for p in pair]
         self._hand_dataset.loc[len(self._hand_dataset)] = list_coords
-        print(list_coords)
 
     def load_dataset(self, db = None):
-        if db is None:
-            self._hand_dataset = pd.DataFrame(columns = ["Category"] + [str(i) for i in range(21*2)])
+        if db is None or not exists(db):
+            print("Creating new dataframe")
+            self._hand_dataset = pd.DataFrame(columns = ["Category"] + [str(i) for i in range(21*3)])
         else:
+            print("Using base dataset")
             self._hand_dataset = pd.read_csv(db)
+
+    def get_action_counts(self):
+        return [self.get_action_count(i) for i in range(len(Gesture))]
+
+    def get_action_count(self, action):
+        return len(self._hand_dataset[self._hand_dataset["Category"] == action])

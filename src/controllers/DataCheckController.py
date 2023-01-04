@@ -33,6 +33,9 @@ class DataCheckController:
 
         self.use_camera = use_camera
 
+        
+        self.view.refresh_count(self.model.get_action_counts())
+
         self.classifier = DistanceBasedClassifier(eps = 1000000000)
 
         self.mpHands = mp.solutions.hands
@@ -65,7 +68,11 @@ class DataCheckController:
         #cv2.imwrite(f"snipe_cut_{time_name}.png", self.model.frame_masked)
         self.model.add_hand_model()
 
-        self.model.hand_dataset.to_csv("data/hand_dataset.csv")
+        
+
+        self.view.refresh_count(self.model.get_action_counts())
+
+        self.model.hand_dataset.to_csv("data/hand_dataset.csv", index=False)
 
         self.classifier.add_hand_action(self.model.hand_cords_expanded, self.model.gesture)
 
@@ -80,6 +87,8 @@ class DataCheckController:
             
             self.get_hand()
             self.detect_hand()
+
+            frame = cv2.flip(frame, 1)
 
             self.model.frame_masked = np.copy(frame)
 
@@ -126,21 +135,16 @@ class DataCheckController:
                 custom_dot = np.array((new_dots[17][0],0,new_dots[17][2]))
                 q2 = rotation_matrix_from_vectors(np.array((np.linalg.norm(custom_dot),0,0)), custom_dot)
                 
-                new_dots2 = [np.array((0,0,0)), new_dots[1]]
-                for dot in new_dots[2:]:
+                new_dots2 = [np.array((0,0,0))]
+                for i, dot in enumerate(new_dots[1:]):
                     new_dots2 += [np.array(dot).dot(q2)]
-                  
-                for dot in new_dots2:
-                    dot[2] = 0.0
-                    
-                y_scale = new_dots2[5][1]
-                for dot in new_dots2:
-                    dot[1] /= y_scale
-                    
-                x_scale = new_dots2[17][0]
-                for dot in new_dots2:
-                    dot[0] /= x_scale
-                
+                new_dots2 = np.array(new_dots2)
+
+                new_dots2[:, 1] /= new_dots2[5][1]
+                new_dots2[:, 1] *= 0.1
+                new_dots2[:, 0] /= new_dots2[17][0]
+                new_dots2[:, 0] *= 0.05
+
                 
                 self.model.hand_pre_cords = np.copy(self.model.hand_cords)
 
@@ -150,14 +154,32 @@ class DataCheckController:
 
                 self.mpDraw.draw_landmarks(frame, handslms, self.mpHands.HAND_CONNECTIONS)
                 
-                cv2.circle(frame, (int(200+new_dots2[0][0]*40), int(200+40*new_dots2[0][1])), 1, (255,255,0),2)
-                cv2.circle(frame, (int(200+new_dots2[5][0]*40), int(200+40*new_dots2[5][1])), 1, (255,0,255),2)
-                cv2.circle(frame, (int(200+new_dots2[17][0]*40), int(200+40*new_dots2[17][1])), 1, (255,127, 127),2)
+                cv2.circle(frame, (int(200+new_dots2[0][0]*400), int(200+400*new_dots2[0][1])), 1, (255,255,0),2)
+                cv2.circle(frame, (int(200+new_dots2[5][0]*400), int(200+400*new_dots2[5][1])), 1, (255,0,255),2)
+                cv2.circle(frame, (int(200+new_dots2[17][0]*400), int(200+400*new_dots2[17][1])), 1, (255,127, 127),2)
                 for i, dot in enumerate(new_dots2):
                     if i in [0, 5, 17]:
                         continue
-                    cv2.circle(frame, (int(200+dot[0]*40), int(200+40*dot[1])), 1, (255,0,0),2)
+                    cv2.circle(frame, (int(200+dot[0]*400), int(200+400*dot[1])), 1, (255,0,0),2)
+
                     
+                cv2.circle(frame, (int(100+dots_relocated[0][0]*400), int(100+400*dots_relocated[0][1])), 1, (255,255,0),2)
+                cv2.circle(frame, (int(100+dots_relocated[5][0]*400), int(100+400*dots_relocated[5][1])), 1, (255,0,255),2)
+                cv2.circle(frame, (int(100+dots_relocated[17][0]*400), int(100+400*dots_relocated[17][1])), 1, (255,127, 127),2)
+                for i, dot in enumerate(dots_relocated):
+                    if i in [0, 5, 17]:
+                        continue
+                    cv2.circle(frame, (int(100+dot[0]*400), int(100+400*dot[1])), 1, (255,0,0),2)
+                    
+
+                cv2.circle(frame, (int(300+new_dots[0][0]*400), int(300+400*new_dots[0][1])), 1, (255,255,0),2)
+                cv2.circle(frame, (int(300+new_dots[5][0]*400), int(300+400*new_dots[5][1])), 1, (255,0,255),2)
+                cv2.circle(frame, (int(300+new_dots[17][0]*400), int(300+400*new_dots[17][1])), 1, (255,127, 127),2)
+                for i, dot in enumerate(new_dots):
+                    if i in [0, 5, 17]:
+                        continue
+                    cv2.circle(frame, (int(300+dot[0]*400), int(300+400*dot[1])), 1, (255,0,0),2)
+
 
         self.model.frame = frame
 
