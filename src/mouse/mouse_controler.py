@@ -1,5 +1,4 @@
 import pyautogui
-from pyautogui import K
 from models.GestureEnum import Gesture
 
 class MouseController:
@@ -41,31 +40,33 @@ class MouseController:
         pyautogui.move(x+direction[0], y+direction[1])
 
     def apply_state(self, action):
+        print(f"Applying state {action}")
+        
         #TODO Remove unused checks if movable state is removed
-        if action == Gesture.NONE:
+        if action == Gesture.NONE.value:
             pass
-        elif action == Gesture.RIGHT_INDEX_EXTENDED:
+        elif action == Gesture.RIGHT_INDEX_EXTENDED.value:
             pass
-        elif action == Gesture.RIGHT_INDEX_HOOK:
+        elif action == Gesture.RIGHT_INDEX_HOOK.value:
             pass
-        elif action == Gesture.RIGHT_INDEX_CLOSED:
+        elif action == Gesture.RIGHT_INDEX_CLOSED.value:
             self.right_click()
-        elif action == Gesture.LEFT_INDEX_EXTENDED:
+        elif action == Gesture.LEFT_INDEX_EXTENDED.value:
             pass
-        elif action == Gesture.LEFT_INDEX_HOOK:
+        elif action == Gesture.LEFT_INDEX_HOOK.value:
             pass
-        elif action == Gesture.LEFT_INDEX_CLOSED:
+        elif action == Gesture.LEFT_INDEX_CLOSED.value:
             self.left_click()
-        elif action == Gesture.PINCH_IN:
+        elif action == Gesture.PINCH_IN.value:
             self.zoom_in()
-        elif action == Gesture.PINCH_OUT:
+        elif action == Gesture.PINCH_OUT.value:
             self.zoom_out()
-        elif action == Gesture.THUMB_UP:
+        elif action == Gesture.THUMB_UP.value:
             self.scroll_up()
-        elif action == Gesture.THUMB_DOWN:
+        elif action == Gesture.THUMB_DOWN.value:
             self.scroll_down()
-        elif action == Gesture.EXTENDED_HAND_START:
+        elif action == Gesture.EXTENDED_HAND_START.value:
             pass
-        elif action == Gesture.EXTENDED_HAND_END:
+        elif action == Gesture.EXTENDED_HAND_END.value:
             self.tab_window()
 

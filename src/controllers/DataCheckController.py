@@ -10,7 +10,7 @@ import mediapipe as mp
 import logging
 
 from ai.distance_based_classifier import DistanceBasedClassifier
-
+from ai.hand_detection_controller import HandDetectionController
 
 def rotation_matrix_from_vectors(vec1, vec2):
     """ Find the rotation matrix that aligns vec1 to vec2
@@ -36,7 +36,19 @@ class DataCheckController:
         
         self.view.refresh_count(self.model.get_action_counts())
 
-        self.classifier = DistanceBasedClassifier(eps = 1000000000)
+        self.classifier = DistanceBasedClassifier(eps = 0.2)
+        print(self.model.hand_dataset.head())
+        df = self.model.hand_dataset
+        for ind in df.index:
+            line = df.loc[ind].tolist()
+            action = line[0]
+            rack = line[1:]
+            self.classifier.add_hand_action(rack, action)
+            
+        
+        self.mouse_controller = HandDetectionController(model = self.classifier)
+        self.mouse_controller.set_active(True)
+        self.mouse_time = 0
 
         self.mpHands = mp.solutions.hands
         self.hands = self.mpHands.Hands(max_num_hands=1, min_detection_confidence=0.8)
@@ -61,6 +73,7 @@ class DataCheckController:
         self.source = cv2.VideoCapture(0)
 
         self.capture_cam()
+
 
     def save_image(self):
         time_name = str(int(time.time() * 1000.0))
@@ -102,9 +115,14 @@ class DataCheckController:
             self.view.frame.after(10, self.capture_cam)
 
     def detect_hand(self):
+        
+        self.mouse_time += 1
+        if self.mouse_time % 100 == 0:
+            self.mouse_controller.step(self.model.hand_cords_expanded)
+        
         if self.model.hand_cords is not None:
             action, distance = self.classifier.predict(self.model.hand_cords_expanded)
-            self.view.distance.config(text = "Distance : " + str(distance))
+            self.view.distance.config(text = "Distance : " + str(distance)[:4])
             self.view.category.config(text = "Category : " + str(action))
         
 
@@ -195,3 +213,7 @@ class DataCheckController:
         """
         # save the model
         self.model.frame = frame
+
+    def toggle_mouse_controller(self):
+        self.mouse_controller.set_active(not self.mouse_controller.is_active())
+        print(f"Current mouse state {self.mouse_controller.is_active()}.")

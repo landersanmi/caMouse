@@ -10,6 +10,9 @@ class DistanceBasedClassifier:
     def add_hand_action(self, hand_rack, category):
         self.hand_actions += [(hand_rack, category)]
     
+    def __call__(self, hand_rack):
+        return self.predict(hand_rack)
+    
     def predict(self, hand_rack):
         if hand_rack is None:
             return None, -1
