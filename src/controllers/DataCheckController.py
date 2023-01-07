@@ -2,6 +2,9 @@ from PIL import Image, ImageTk
 import tkinter as tk
 import cv2
 import numpy as np
+import pandas as pd
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import time
 
@@ -133,6 +136,9 @@ class DataCheckController:
             self.view.distance.config(text = "Distance : " + str(distance)[:4])
             self.view.category.config(text = "Category : " + str(action))
         
+            if self.mouse_controller.is_active():
+                self.save_step(self.model.hand_cords_expanded, action)
+        
 
     def get_hand(self, tridimensional = False):
         frame = self.model.frame
@@ -249,3 +255,8 @@ class DataCheckController:
         buf = canvas.buffer_rgba()
         plot = np.asarray(buf)
         return plot
+
+    def save_step(self, hand_model, state):
+        row = pd.Series([state] + hand_model, index=self.model.history.columns, name=1)
+        self.model.history = self.model.history.append(row)
+        self.model.history.to_csv("data/history.csv", sep=',', index=False)

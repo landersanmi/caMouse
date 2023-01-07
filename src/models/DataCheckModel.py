@@ -77,7 +77,6 @@ class DataCheckModel:
     def hand_cords(self, value):
         self._hand_cords = value
 
-
     @property
     def hand_dataset(self):
         return self._hand_dataset
@@ -86,7 +85,8 @@ class DataCheckModel:
     def hand_dataset(self, value):
         self.hand_dataset = value
 
-    def __init__(self, db = "data/hand_dataset.csv"):
+
+    def __init__(self, db = "data/hand_dataset.csv", history = "data/history.csv"):
         self._frame = None
         self._frame_masked = None
         self.plot = None
@@ -101,6 +101,7 @@ class DataCheckModel:
 
         self._hand_dataset = None
 
+        self.history = pd.read_csv(history)
         self.load_dataset(db)
 
     def add_hand_model(self):
@@ -115,6 +116,7 @@ class DataCheckModel:
         else:
             print("Using base dataset")
             self._hand_dataset = pd.read_csv(db)
+
 
     def get_action_counts(self):
         return [self.get_action_count(i) for i in range(len(Gesture))]

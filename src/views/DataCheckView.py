@@ -138,9 +138,6 @@ class DataCheckView(ttk.Frame):
         
     def reset_data(self):
         raise NotImplementedError("Not implemented.")
-    
-    def on_slider_change(self, event):
-        raise NotImplementedError("Not implemented.")
 
     def get_history(self):
         HistoryWindow(self)

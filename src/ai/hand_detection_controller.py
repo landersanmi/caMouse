@@ -30,7 +30,6 @@ class HandDetectionController:
             return
         
         print("-----------")
-        
         # TODO Maybe add the frame to hand detector here
         action, _ = self.model(hand_model)
         print(f"Got action {action}")
@@ -39,7 +38,5 @@ class HandDetectionController:
         print(f"Moving to state {state}")
 
         self.mouse.apply_state(state)
-
         if self.action_graph.is_currently_moveable():
             self.mouse.move_mouse(self.get_direction(hand_model))
-
