@@ -9,8 +9,16 @@ import mediapipe as mp
 
 import logging
 
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+
 from ai.distance_based_classifier import DistanceBasedClassifier
 from ai.hand_detection_controller import HandDetectionController
+
+HAND_CONNECTIONS = [(0, 1), (0, 5), (0, 17), (1, 2), (2, 3), (3, 4), (5, 6), (5, 9), 
+                    (6, 7), (7, 8), (9, 10), (9, 13), (10, 11), (11, 12), (13, 14), 
+                    (13, 17), (14, 15), (15, 16), (17, 18), (18, 19), (19, 20)]
 
 def rotation_matrix_from_vectors(vec1, vec2):
     """ Find the rotation matrix that aligns vec1 to vec2
@@ -116,7 +124,7 @@ class DataCheckController:
 
     def detect_hand(self):
         
-        self.mouse_time += 1
+        self.mouse_time += 100
         if self.mouse_time % 100 == 0:
             self.mouse_controller.step(self.model.hand_cords_expanded)
         
@@ -138,15 +146,19 @@ class DataCheckController:
 
         if result.multi_hand_landmarks:
             for handslms in result.multi_hand_landmarks:
+                x, y, z = [], [], []
                 for i, lm in enumerate(handslms.landmark):
                     dots = np.append(dots, [[lm.x, lm.y, lm.z]] , axis=0)
-                
+                    x.append(lm.x)
+                    y.append(lm.y)
+                    z.append(lm.z)
                 dots_relocated = dots[0]-dots 
-
+                
                 # Rotate to certain position
                 q = rotation_matrix_from_vectors(np.array((0,1,0)), np.array(dots_relocated[5]))
                 
                 new_dots = [np.array((0,0,0))]
+
                 for dot in dots_relocated[1:]:
                     new_dots += [np.array(dot).dot(q)]
 
@@ -198,7 +210,13 @@ class DataCheckController:
                         continue
                     cv2.circle(frame, (int(300+dot[0]*400), int(300+400*dot[1])), 1, (255,0,0),2)
 
-
+                
+                if len(x) != 0: 
+                    plot = self.generate_3D_plot(x, y, z)
+                    tk_hand_image = ImageTk.PhotoImage(Image.fromarray(plot))
+                    self.view.plot.configure(image=tk_hand_image)
+                    self.view.plot.image = tk_hand_image
+                
         self.model.frame = frame
 
     def change_gesture(self):
@@ -206,14 +224,28 @@ class DataCheckController:
         self.model.gesture = gesture_type
 
     def set_frame(self, frame):
-        """
-        Save the email
-        :param email:
-        :return:
-        """
         # save the model
         self.model.frame = frame
 
     def toggle_mouse_controller(self):
         self.mouse_controller.set_active(not self.mouse_controller.is_active())
         print(f"Current mouse state {self.mouse_controller.is_active()}.")
+    
+    def generate_3D_plot(self, x, y, z):
+        plt.close('all')
+        fig = plt.figure(figsize=(8, 8), dpi=75)
+        canvas = FigureCanvasAgg(fig)
+        ax = plt.axes(projection='3d')
+        ax.scatter3D(x, y, z, s=6)
+
+        for connection in HAND_CONNECTIONS:
+            x1, x2 = x[connection[0]], x[connection[1]]
+            y1, y2 = y[connection[0]], y[connection[1]]
+            z1, z2 = z[connection[0]], z[connection[1]]
+            X, Y, Z = [x1, x2], [y1, y2], [z1, z2]
+            ax.plot(X, Y, zs=Z, linewidth=10, color='b')
+
+        canvas.draw()
+        buf = canvas.buffer_rgba()
+        plot = np.asarray(buf)
+        return plot

@@ -27,10 +27,10 @@ class MouseController:
         pyautogui.keyUp('altleft')
 
     def scroll_up(self):
-        pyautogui.scroll(10)
+        pyautogui.scroll(100)
 
     def scroll_down(self):
-        pyautogui.scroll(-10)
+        pyautogui.scroll(-100)
 
     def move_mouse(self, direction):
         """

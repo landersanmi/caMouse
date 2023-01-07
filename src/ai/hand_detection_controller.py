@@ -36,7 +36,7 @@ class HandDetectionController:
         print(f"Got action {action}")
 
         state = self.action_graph.step(action)
-        print(f"Moving to state {action}")
+        print(f"Moving to state {state}")
 
         self.mouse.apply_state(state)
 

@@ -10,6 +10,8 @@ class App(tk.Tk):
 
         self.title('Hand Gestures analyzer')
         self.protocol("WM_DELETE_WINDOW", self.destroy)
+        self.call("source", "src/themes/azure.tcl")
+        self.call("set_theme", "light")
 
         model = DataCheckModel()
 

@@ -26,6 +26,14 @@ class DataCheckModel:
         self._frame_masked = value
 
     @property
+    def plot(self):
+        return self._plot
+
+    @plot.setter
+    def plot(self, value):
+        self._plot = value
+
+    @property
     def gesture(self):
         return self._gesture
 
@@ -81,6 +89,7 @@ class DataCheckModel:
     def __init__(self, db = "data/hand_dataset.csv"):
         self._frame = None
         self._frame_masked = None
+        self.plot = None
         self._status = None
         # TODO Set base gesture
         self._gesture = None

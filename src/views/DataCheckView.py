@@ -14,41 +14,48 @@ class DataCheckView(ttk.Frame):
 
         self.pack(fill=tk.BOTH, expand=True)
 
+
+        self.gesture_row = ttk.LabelFrame(self, text="Gestures")
+        self.gesture_row.pack(side=tk.TOP, fill = tk.X, expand=True, pady=10, padx=10)
+
+        self.bottom_row = ttk.Frame(self)
+        self.bottom_row.pack(side=tk.BOTTOM)
+
         self.left_col = ttk.Frame(self)
-        self.left_col.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.left_col.pack(side=tk.LEFT, fill=tk.X, expand=True)
         
-        self.right_col = tk.Frame(self, bg="black")
-        self.right_col.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-        
-        
-        
+        self.right_col = ttk.Frame(self)
+        self.right_col.pack(side=tk.RIGHT, fill=tk.X, expand=True)
+
 
         # Frame
         self.frame = ttk.Label(self.left_col)
-        self.frame.pack(fill=tk.BOTH, expand=True)
+        self.frame.pack(fill=tk.X, expand=True, padx=10)
+
+        # Plot
+        self.plot = ttk.Label(self.right_col)
+        self.plot.pack(side=tk.TOP, fill=tk.X, expand=True)
+
 
         # Button Bar
-        self.under_bar = ttk.Frame(self.left_col)
-        self.under_bar.pack(fill=tk.X, side = tk.BOTTOM, expand=True)
-
+        self.under_bar = ttk.Frame(self.bottom_row)
+        self.under_bar.pack(side = tk.TOP)
 
         self.message_label = ttk.Button(self.under_bar, text='Capture', command=self.save_image)
-        self.message_label.grid(row=0, column=2)
+        self.message_label.grid(row=0, column=2, padx=5, pady=10)
 
         self.reset_dataset = ttk.Button(self.under_bar, text='Play', command=self.toggle_mouse_control)
-        self.reset_dataset.grid(row=0, column=1)
+        self.reset_dataset.grid(row=0, column=1, padx=5, pady=10)
         
         self.reset_dataset = ttk.Button(self.under_bar, text='Reset', command=self.reset_data)
-        self.reset_dataset.grid(row=0, column=3)
+        self.reset_dataset.grid(row=0, column=3, padx=5, pady=10)
 
         self.view_history = ttk.Button(self.under_bar, text='History', command=self.get_history)
-        self.view_history.grid(row=0, column=0)
-
-
+        self.view_history.grid(row=0, column=0, padx=5, pady=10)
 
         # Gestures        
         self.opcion = tk.IntVar() 
-        self.gesture_panel = tk.Frame(self.right_col, bg="red")
+        self.gesture_panel = tk.Frame(self.gesture_row)
         
         self.gesture_panel.grid_columnconfigure(0, weight=1)
         self.gesture_panel.grid_rowconfigure(0, weight=1)
@@ -68,7 +75,7 @@ class DataCheckView(ttk.Frame):
 
         for index, gesture in enumerate(Gesture):
             
-            actions_frame = tk.Frame(self.gesture_panel, bg="blue")
+            actions_frame = tk.Frame(self.gesture_panel)#, bg="blue")
             rb = tk.Radiobutton(
                 actions_frame, 
                 text=gesture.name,
@@ -76,18 +83,22 @@ class DataCheckView(ttk.Frame):
                 value=index,
                 command=self.change_gesture,
                 indicator=0,
-                background = "light blue")
-
+                background= '#5e99ff')
+            
             gesture_label = ttk.Label(actions_frame, text=f"{0}")
 
             
             self.gesture_rbs += [rb]
             self.gesture_labels += [gesture_label]
 
-            rb.pack(side=tk.LEFT, expand=True)
-            gesture_label.pack(side=tk.LEFT, expand=True)
+            rb.grid(row=0, column=0)
+            gesture_label.grid(row=1, column=0)
+            actions_frame.grid(row=0, column=index, sticky='EWNS',pady = 5, padx=5)
+
+            #rb.pack(side=tk.LEFT, expand=True)
+            #gesture_label.pack(side=tk.LEFT, expand=True)
             
-            actions_frame.grid(row=index//3, column=index%3, sticky='NWSE')
+            actions_frame.grid(row=index//7, column=index%7, sticky='NWSE')
 
         
         # message
@@ -127,6 +138,9 @@ class DataCheckView(ttk.Frame):
         
     def reset_data(self):
         raise NotImplementedError("Not implemented.")
-        
+    
+    def on_slider_change(self, event):
+        raise NotImplementedError("Not implemented.")
+
     def get_history(self):
         HistoryWindow(self)
