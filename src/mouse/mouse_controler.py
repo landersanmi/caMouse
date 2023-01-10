@@ -38,7 +38,7 @@ class MouseController:
         """
         x, y = pyautogui.position()
         print(f"Moving to {(x+direction[0], y+direction[1])}")
-        pyautogui.move(x+direction[0], y+direction[1])
+        pyautogui.move(direction[0], -direction[1])
 
     def apply_state(self, action):
         print(f"Applying state {action}")

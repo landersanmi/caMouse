@@ -25,10 +25,9 @@ class HandDetectionController:
             return None
         
         direction = (
-            0.01*(self.prev_position[0, 0] - hand_model[0, 0]),
-            0.01*(self.prev_position[0, 1] - hand_model[0, 1])
+            int(6000*(self.prev_position[5, 0] - hand_model[5, 0])),
+            int(6000*(self.prev_position[5, 1] - hand_model[5, 1]))
         )
-        
         self.prev_position = hand_model
         
         return direction

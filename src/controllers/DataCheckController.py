@@ -135,13 +135,13 @@ class DataCheckController:
             self.view.distance.config(text = "Distance : " + str(distance)[:4])
             self.view.category.config(text = "Category : " + str(action))
         
-            if self.mouse_time % 20 == 0:
-                if self.mouse_controller.is_active():
-                    self.mouse_controller.step(
-                        self.model.hand_cords_expanded, 
-                        self.model.hand_real_coords)
-                
-                    self.save_step(self.model.hand_cords_expanded, action)
+            #if self.mouse_time % 20 == 0:
+            if self.mouse_controller.is_active():
+                self.mouse_controller.step(
+                    self.model.hand_cords_expanded, 
+                    self.model.hand_real_coords)
+            
+                self.save_step(self.model.hand_cords_expanded, action)
         
 
     def get_hand(self, tridimensional = False):
@@ -225,10 +225,12 @@ class DataCheckController:
                 
                 if len(x) != 0: 
                     if self.model.plot_toogle:
+                        
                         plot = self.generate_3D_plot(x, y, z)
                         tk_hand_image = ImageTk.PhotoImage(Image.fromarray(plot))
                         self.view.plot.configure(image=tk_hand_image)
                         self.view.plot.image = tk_hand_image
+                        
         else:
             self.model.hand_cords = None      
         self.model.frame = frame
