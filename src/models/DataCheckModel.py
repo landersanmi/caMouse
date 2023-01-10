@@ -33,6 +33,15 @@ class DataCheckModel:
     def plot(self, value):
         self._plot = value
 
+
+    @property
+    def plot_toogle(self):
+        return self._plot_toogle
+
+    @plot_toogle.setter
+    def plot_toogle(self, value):
+        self._plot_toogle = value
+
     @property
     def gesture(self):
         return self._gesture
@@ -64,6 +73,15 @@ class DataCheckModel:
     @hand_pre_cords.setter
     def hand_pre_cords(self, value):
         self._hand_pre_cords = value
+
+    @property
+    def hand_real_coords(self):
+        return self._hand_real_coords
+
+    @hand_real_coords.setter
+    def hand_real_coords(self, value):
+        self._hand_real_coords_pre = np.copy(self._hand_real_coords)
+        self._hand_real_coords = value
 
     @property
     def hand_cords(self):
@@ -103,6 +121,11 @@ class DataCheckModel:
         self._hand_normalized_cords = None
 
         self._hand_dataset = None
+        
+        self._hand_real_coords = None
+        self._hand_real_coords_pre = None
+        
+        self._plot_toogle = True
 
         self.history = pd.read_csv(history)
         self.load_dataset(db)

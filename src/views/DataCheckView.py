@@ -44,7 +44,7 @@ class DataCheckView(ttk.Frame):
         self.message_label = ttk.Button(self.under_bar, text='Capture', command=self.save_image)
         self.message_label.grid(row=0, column=2, padx=5, pady=10)
 
-        self.reset_dataset = ttk.Button(self.under_bar, text='Play', command=self.toggle_mouse_control)
+        self.reset_dataset = ttk.Button(self.under_bar, text='Toggle Mouse', command=self.toggle_mouse_control)
         self.reset_dataset.grid(row=0, column=1, padx=5, pady=10)
         
         self.reset_dataset = ttk.Button(self.under_bar, text='Reset', command=self.reset_data)

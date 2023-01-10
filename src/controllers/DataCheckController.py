@@ -61,6 +61,7 @@ class DataCheckController:
         self.mouse_controller.set_active(True)
         self.mouse_time = 0
 
+
         self.mpHands = mp.solutions.hands
         self.hands = self.mpHands.Hands(max_num_hands=1, min_detection_confidence=0.8)
         self.mpDraw = mp.solutions.drawing_utils
@@ -127,17 +128,20 @@ class DataCheckController:
 
     def detect_hand(self):
         
-        self.mouse_time += 100
-        if self.mouse_time % 100 == 0:
-            self.mouse_controller.step(self.model.hand_cords_expanded)
+        self.mouse_time += 1
         
         if self.model.hand_cords is not None:
             action, distance = self.classifier.predict(self.model.hand_cords_expanded)
             self.view.distance.config(text = "Distance : " + str(distance)[:4])
             self.view.category.config(text = "Category : " + str(action))
         
-            if self.mouse_controller.is_active():
-                self.save_step(self.model.hand_cords_expanded, action)
+            if self.mouse_time % 20 == 0:
+                if self.mouse_controller.is_active():
+                    self.mouse_controller.step(
+                        self.model.hand_cords_expanded, 
+                        self.model.hand_real_coords)
+                
+                    self.save_step(self.model.hand_cords_expanded, action)
         
 
     def get_hand(self, tridimensional = False):
@@ -158,6 +162,8 @@ class DataCheckController:
                     x.append(lm.x)
                     y.append(lm.y)
                     z.append(lm.z)
+                    
+                self.model.hand_real_coords = np.copy(dots)
                 dots_relocated = dots[0]-dots 
                 
                 # Rotate to certain position
@@ -218,10 +224,11 @@ class DataCheckController:
 
                 
                 if len(x) != 0: 
-                    plot = self.generate_3D_plot(x, y, z)
-                    tk_hand_image = ImageTk.PhotoImage(Image.fromarray(plot))
-                    self.view.plot.configure(image=tk_hand_image)
-                    self.view.plot.image = tk_hand_image
+                    if self.model.plot_toogle:
+                        plot = self.generate_3D_plot(x, y, z)
+                        tk_hand_image = ImageTk.PhotoImage(Image.fromarray(plot))
+                        self.view.plot.configure(image=tk_hand_image)
+                        self.view.plot.image = tk_hand_image
         else:
             self.model.hand_cords = None      
         self.model.frame = frame
@@ -235,12 +242,14 @@ class DataCheckController:
         self.model.frame = frame
 
     def toggle_mouse_controller(self):
-        self.mouse_controller.set_active(not self.mouse_controller.is_active())
+        self.model.plot_toogle = not self.model.plot_toogle
+        self.mouse_controller.set_active(self.model.plot_toogle)
         print(f"Current mouse state {self.mouse_controller.is_active()}.")
     
     def generate_3D_plot(self, x, y, z):
+
         plt.close('all')
-        fig = plt.figure(figsize=(8, 8), dpi=75)
+        fig = plt.figure(figsize=(8, 8), dpi=35)
         canvas = FigureCanvasAgg(fig)
         ax = plt.axes(projection='3d')
         ax.scatter3D(x, y, z, s=6)

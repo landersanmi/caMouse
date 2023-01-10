@@ -37,6 +37,7 @@ class MouseController:
             Direction : Tuple (float, float) Represents (x,y) direction
         """
         x, y = pyautogui.position()
+        print(f"Moving to {(x+direction[0], y+direction[1])}")
         pyautogui.move(x+direction[0], y+direction[1])
 
     def apply_state(self, action):

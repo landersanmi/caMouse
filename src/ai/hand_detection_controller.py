@@ -20,18 +20,26 @@ class HandDetectionController:
         self._is_active = state
 
     def get_direction(self, hand_model):
-        # TODO Implement the direction function
+        if self.prev_position is None:
+            self.prev_position = hand_model
+            return None
+        
+        direction = (
+            0.01*(self.prev_position[0, 0] - hand_model[0, 0]),
+            0.01*(self.prev_position[0, 1] - hand_model[0, 1])
+        )
+        
         self.prev_position = hand_model
+        
+        return direction
 
-        raise NotImplementedError("Direction of hand is not yet implemented.")
-
-    def step(self, hand_model) -> None:
-        if not self.is_active() or hand_model is None:
+    def step(self, hand_model_normalized, hand_model_real) -> None:
+        if not self.is_active() or hand_model_normalized is None:
             return
         
         print("-----------")
         # TODO Maybe add the frame to hand detector here
-        action, _ = self.model(hand_model)
+        action, _ = self.model(hand_model_normalized)
         print(f"Got action {action}")
 
         state = self.action_graph.step(action)
@@ -39,4 +47,10 @@ class HandDetectionController:
 
         self.mouse.apply_state(state)
         if self.action_graph.is_currently_moveable():
-            self.mouse.move_mouse(self.get_direction(hand_model))
+            direction = self.get_direction(hand_model_real)
+            
+            if direction is not None:
+                try:
+                    self.mouse.move_mouse(direction)
+                except:
+                    print("Not possible move")
