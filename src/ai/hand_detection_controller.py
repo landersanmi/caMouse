@@ -26,7 +26,7 @@ class HandDetectionController:
         raise NotImplementedError("Direction of hand is not yet implemented.")
 
     def step(self, hand_model) -> None:
-        if not self.is_active():
+        if not self.is_active() or hand_model is None:
             return
         
         print("-----------")

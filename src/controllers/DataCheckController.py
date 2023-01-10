@@ -222,7 +222,8 @@ class DataCheckController:
                     tk_hand_image = ImageTk.PhotoImage(Image.fromarray(plot))
                     self.view.plot.configure(image=tk_hand_image)
                     self.view.plot.image = tk_hand_image
-                
+        else:
+            self.model.hand_cords = None      
         self.model.frame = frame
 
     def change_gesture(self):

@@ -71,6 +71,9 @@ class DataCheckModel:
 
     @property
     def hand_cords_expanded(self):
+        if self._hand_cords is None:
+            return None
+
         return [p for pair in self._hand_cords for p in pair]
 
     @hand_cords.setter
