@@ -1,11 +1,13 @@
 import re
 import tkinter as tk
+import numpy as np
+
 from tkinter import ttk
 from PIL import Image, ImageTk
-import numpy as np
 
 from models.GestureEnum import Gesture
 from .HistoryView import HistoryWindow
+
 
 class DataCheckView(ttk.Frame):
 
@@ -13,7 +15,6 @@ class DataCheckView(ttk.Frame):
         super().__init__(parent)
 
         self.pack(fill=tk.BOTH, expand=True)
-
 
         self.gesture_row = ttk.LabelFrame(self, text="Gestures")
         self.gesture_row.pack(side=tk.TOP, fill = tk.X, expand=True, pady=10, padx=10)
@@ -27,7 +28,6 @@ class DataCheckView(ttk.Frame):
         self.right_col = ttk.Frame(self)
         self.right_col.pack(side=tk.RIGHT, fill=tk.X, expand=True)
 
-
         # Frame
         self.frame = ttk.Label(self.left_col)
         self.frame.pack(fill=tk.X, expand=True, padx=10)
@@ -35,7 +35,6 @@ class DataCheckView(ttk.Frame):
         # Plot
         self.plot = ttk.Label(self.right_col)
         self.plot.pack(side=tk.TOP, fill=tk.X, expand=True)
-
 
         # Button Bar
         self.under_bar = ttk.Frame(self.bottom_row)
@@ -70,12 +69,8 @@ class DataCheckView(ttk.Frame):
         self.gesture_rbs = []
         self.gesture_labels = []
 
-        #self.gesture_scroll = tk.Scrollbar(self.gesture_panel, orient='horizontal')
-        #self.gesture_scroll.pack(side=tk.BOTTOM, fill='x')
-
         for index, gesture in enumerate(Gesture):
-            
-            actions_frame = tk.Frame(self.gesture_panel)#, bg="blue")
+            actions_frame = tk.Frame(self.gesture_panel)
             rb = tk.Radiobutton(
                 actions_frame, 
                 text=gesture.name,
@@ -87,21 +82,15 @@ class DataCheckView(ttk.Frame):
             
             gesture_label = ttk.Label(actions_frame, text=f"{0}")
 
-            
             self.gesture_rbs += [rb]
             self.gesture_labels += [gesture_label]
 
             rb.grid(row=0, column=0)
             gesture_label.grid(row=1, column=0)
             actions_frame.grid(row=0, column=index, sticky='EWNS',pady = 5, padx=5)
-
-            #rb.pack(side=tk.LEFT, expand=True)
-            #gesture_label.pack(side=tk.LEFT, expand=True)
-            
             actions_frame.grid(row=index//7, column=index%7, sticky='NWSE')
 
-        
-        # message
+        # Model prediction info
         self.info_panel = ttk.Frame(self)
         self.distance = ttk.Label(self.info_panel, text='Min Distance: ')
         self.distance.pack()
@@ -111,16 +100,10 @@ class DataCheckView(ttk.Frame):
 
         self.info_panel.pack(side=tk.BOTTOM, fill=tk.BOTH)
 
-        
-        # set the controller
+        # Set the controller
         self.controller = None
 
     def set_controller(self, controller):
-        """
-        Set the controller
-        :param controller:
-        :return:
-        """
         self.controller = controller
 
     def refresh_count(self, count_list):

@@ -1,14 +1,13 @@
 import numpy as np
-
 import pandas as pd
 
 from os.path import exists
 
 from models.GestureEnum import Gesture
 
+
 class DataCheckModel:
     
-
     @property
     def frame(self):
         return self._frame
@@ -32,7 +31,6 @@ class DataCheckModel:
     @plot.setter
     def plot(self, value):
         self._plot = value
-
 
     @property
     def plot_toogle(self):
@@ -91,7 +89,6 @@ class DataCheckModel:
     def hand_cords_expanded(self):
         if self._hand_cords is None:
             return None
-
         return [p for pair in self._hand_cords for p in pair]
 
     @hand_cords.setter
@@ -106,27 +103,24 @@ class DataCheckModel:
     def hand_dataset(self, value):
         self.hand_dataset = value
 
-
     def __init__(self, db = "data/hand_dataset.csv", history = "data/history.csv"):
         self._frame = None
         self._frame_masked = None
         self.plot = None
+        self._plot_toogle = True
+
         self._status = None
-        # TODO Set base gesture
         self._gesture = None
 
         self._hand_cords = None
         self._hand_pre_cords = None
-
+        
         self._hand_normalized_cords = None
-
-        self._hand_dataset = None
         
         self._hand_real_coords = None
         self._hand_real_coords_pre = None
         
-        self._plot_toogle = True
-
+        self._hand_dataset = None
         self.history = pd.read_csv(history)
         self.load_dataset(db)
 
@@ -142,7 +136,6 @@ class DataCheckModel:
         else:
             print("Using base dataset")
             self._hand_dataset = pd.read_csv(db)
-
 
     def get_action_counts(self):
         return [self.get_action_count(i) for i in range(len(Gesture))]

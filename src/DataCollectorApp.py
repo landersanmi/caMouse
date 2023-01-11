@@ -12,9 +12,7 @@ class App(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.geometry("2500x1380")
         self.state('zoomed') 
-        #self.resizable(0, 0)
-        #self.columnconfigure(0, weight=1)
-        #self.columnconfigure(1, weight=8)
+
         self.call("source", "themes/azure.tcl")
         self.call("set_theme", "light")
 

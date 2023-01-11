@@ -1,19 +1,20 @@
 import re
 import tkinter as tk
-from tkinter import ttk
-from PIL import Image, ImageTk
 import numpy as np
 import pandas as pd
-
-from models.GestureEnum import Gesture
-
 import matplotlib
 import matplotlib.pyplot as plt
+
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+from tkinter import ttk
+from PIL import Image, ImageTk
+
+from models.GestureEnum import Gesture
 
 HAND_CONNECTIONS = [(0, 1), (0, 5), (0, 17), (1, 2), (2, 3), (3, 4), (5, 6), (5, 9), 
                     (6, 7), (7, 8), (9, 10), (9, 13), (10, 11), (11, 12), (13, 14), 
                     (13, 17), (14, 15), (15, 16), (17, 18), (18, 19), (19, 20)]
+
 
 class HistoryWindow(tk.Toplevel):
 
@@ -23,7 +24,6 @@ class HistoryWindow(tk.Toplevel):
         self.history_data = pd.read_csv('data/history.csv')
         self.current_id = self.history_data.shape[0]-1
         self.current_predicted_gesture = self.history_data.iloc[-1][0]
-        print(self.current_predicted_gesture)
         self.plot = None
         self.load_window()
         self.plot_current_id_hand()
@@ -59,8 +59,10 @@ class HistoryWindow(tk.Toplevel):
         self.current_id = self.slider_value.get()
         self.plot_current_id_hand()
         self.current_predicted_gesture = self.history_data.iloc[self.current_id][0]
-        self.predicted_gesture_label.config(text="Predicted gesture ID: " + str(self.current_predicted_gesture))
-
+        try:
+            self.predicted_gesture_label.config(text="Predicted gesture ID: " + str(self.current_predicted_gesture))
+        except:
+            pass
     def generate_3D_plot(self, data, category):
         plt.close('all')
         fig = plt.figure(figsize=(8, 8), dpi=75)

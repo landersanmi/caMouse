@@ -1,20 +1,18 @@
 import json
 
+
 class Node:
 
     # Connections (Condition, Direction)
     #   E.g (Finger_Down(5) -> Node(4)[Click])
     def __init__(self):
         """
-        
         Args:
             - Value: Int
             - Contections: List[[Int, Int]]
         """
         self.connections = dict()
-
         self._is_recursive = False
-
         self.info = {}
 
     def add_conection(self, to, condition):
@@ -26,7 +24,6 @@ class Node:
     def get_info(self, key):
         try:
             result = self.info[key]
-
             return result
         except:
             return None
@@ -45,16 +42,14 @@ class Node:
     def is_recursive(self, is_recusive):
         self._is_recursive = is_recusive
 
+
 class ActionGraph:
 
     BASE_NODE = 0
 
     def __init__(self, base_gaph):
-        
         self.nodes = []
-
         self.curr_pos = self.BASE_NODE
-
         self.read_base_graph(base_gaph)
 
     def read_base_graph(self, base_graph):
@@ -88,5 +83,5 @@ class ActionGraph:
     def is_currently_moveable(self):
         if self.nodes[self.curr_pos].get_info("moveable") is not None:
             return self.nodes[self.curr_pos].get_info("moveable")
-        
+            
         return False

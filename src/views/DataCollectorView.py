@@ -1,8 +1,10 @@
-from tkinter import ttk
 import tkinter as tk
 import threading
 import numpy as np
 import math
+
+from tkinter import ttk
+
 
 class DataCollectorView(ttk.Frame):
     def __init__(self, parent):
@@ -40,8 +42,7 @@ class DataCollectorView(ttk.Frame):
     def add_cam_frame(self):
         new_camera = CameraFrame(self.visualization_frame.cameras_frame, controller=self.controller)
         self.visualization_frame.camera_frames = np.append(self.visualization_frame.camera_frames, new_camera)
-        new_camera.pack(side=tk.TOP)#, fill=tk.BOTH, expand=False)
-    
+        new_camera.pack(side=tk.TOP)
     def on_record_btn(self):
         if self.controller:
             record_thread = threading.Thread(target=self.controller.record_data)
@@ -130,24 +131,6 @@ class ConfigFrame(ttk.Frame):
 class VisualizationFrame(ttk.Frame):
     def __init__(self, window, controller):
         super().__init__(window)   
-        
-        '''
-        self.cameras_container = ttk.Frame(window)
-        self.canvas = tk.Canvas(self.cameras_container)
-        self.scrollbar = ttk.Scrollbar(self.cameras_container, orient=tk.VERTICAL, command=self.canvas.yview)
-        self.cameras_frame = ttk.Frame(self.canvas)
-        self.bind(
-            "<Configure>",
-            lambda e: self.canvas.configure(
-                scrollregion=self.canvas.bbox(tk.ALL)
-            )
-        )
-        self.canvas.create_window((0, 0), window=self.cameras_frame, anchor=tk.NW)
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.cameras_container.pack(side=tk.TOP)
-        '''
         self.cameras_frame = ttk.Frame(window)
         self.cameras_frame.pack(side=tk.TOP)#, fill=tk.Y, expand=True)
 
@@ -162,15 +145,14 @@ class CameraFrame(ttk.Frame):
         self.cam_lbl = ttk.Label(window)
         self.hand_lbl = ttk.Label(window)
         cam_count = controller.get_cam_count()
-        #if cam_count % 3 == 0:
-            #column = 4
+
         if cam_count % 2 == 0:
             column = 2
         else:
             column = 0
         row = math.floor((cam_count-0.00000001)/2)
 
-        self.cam_lbl.grid(row=row, column=column)#pack(side=tk.LEFT)
-        self.hand_lbl.grid(row=row, column=column+1)#pack(side=tk.LEFT) 
+        self.cam_lbl.grid(row=row, column=column)
+        self.hand_lbl.grid(row=row, column=column+1)
 
 

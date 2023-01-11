@@ -2,15 +2,14 @@ from graph.graph import ActionGraph
 
 from mouse.mouse_controler import MouseController
 
+
 class HandDetectionController:
+
     def __init__(self, model = None) -> None:
         self.action_graph = ActionGraph("base")
         self.model = model
-
         self._is_active = False
-
         self.mouse = MouseController()
-
         self.prev_position = None
 
     def is_active(self):
@@ -36,11 +35,8 @@ class HandDetectionController:
         if not self.is_active() or hand_model_normalized is None:
             return
         
-        #print("-----------")
-        # TODO Maybe add the frame to hand detector here
         action, _ = self.model(hand_model_normalized)
         #print(f"Got action {action}")
-
         state = self.action_graph.step(action)
         #print(f"Moving to state {state}")
 
@@ -52,5 +48,5 @@ class HandDetectionController:
                 try:
                     self.mouse.move_mouse(direction)
                 except:
-                    pass
-                    #print("Not possible move")
+                    print("Not possible move")
+  

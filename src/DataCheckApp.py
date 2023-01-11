@@ -1,8 +1,9 @@
 import tkinter as tk
+import threading
+
 from views.DataCheckView import DataCheckView
 from models.DataCheckModel import DataCheckModel
 from controllers.DataCheckController import DataCheckController
-import threading
 
 class App(tk.Tk):
     def __init__(self):
@@ -14,10 +15,7 @@ class App(tk.Tk):
         self.call("set_theme", "light")
 
         model = DataCheckModel()
-
         view = DataCheckView(self)
-        #view.pack(side="left")
-
         controller = DataCheckController(model, view)
         view.set_controller(controller)
         

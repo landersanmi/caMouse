@@ -9,6 +9,7 @@ GESTURES = ['RightIndexExtended', 'RightIndexHook', 'RightIndexClosed',
             'PinchIn', 'PinchOut', 'ThumbUp', 'ThumbDown',
             'ExtendedHandStart', 'ExtendedHandEnd', 'None']
 
+
 class DataCollectorModel:
     def __init__(self, cam_ids, selected_gesture, record_time, save_dir):   
         cameras = []
@@ -45,10 +46,10 @@ class DataCollectorModel:
         self.gesture_types = GESTURES
         self.gestures_df = pd.DataFrame(columns=self.columnames)
 
-    
     @property
     def cameras(self):
         return self.__cameras
+
     @cameras.setter
     def cameras(self, cameras):
         self.__cameras = cameras
@@ -56,6 +57,7 @@ class DataCollectorModel:
     @property
     def selected_gesture(self):
         return self.__selected_gesture
+
     @selected_gesture.setter
     def selected_gesture(self, selected_gesture):
         if selected_gesture in GESTURES:
@@ -66,6 +68,7 @@ class DataCollectorModel:
     @property
     def record_time(self):
         return self.__record_time
+
     @record_time.setter
     def record_time(self, record_time):
         try:
@@ -76,6 +79,7 @@ class DataCollectorModel:
     @property
     def save_dir(self):
         return self.__save_dir
+
     @save_dir.setter
     def save_dir(self, save_dir):
         if os.path.exists(save_dir):
@@ -86,6 +90,7 @@ class DataCollectorModel:
     @property
     def model_dir(self):
         return self.__model_dir
+
     @model_dir.setter
     def model_dir(self, model_dir):
         if os.path.exists(model_dir):
@@ -96,6 +101,7 @@ class DataCollectorModel:
     @property
     def test_mode(self):
         return self.__test_mode
+
     @test_mode.setter
     def test_mode(self, test_mode):
         self.__test_mode = test_mode
@@ -103,6 +109,7 @@ class DataCollectorModel:
     @property
     def is_recording(self):
         return self.__is_recording
+
     @is_recording.setter
     def is_recording(self, is_recording):
         self.__is_recording = is_recording
@@ -110,6 +117,7 @@ class DataCollectorModel:
     @property
     def gestures_df(self):
         return self.__gestures_df
+        
     @gestures_df.setter
     def gestures_df(self, gestures_df):
         self.__gestures_df = gestures_df

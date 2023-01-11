@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Gesture(Enum):
     NONE = 0
     RIGHT_INDEX_EXTENDED = 1

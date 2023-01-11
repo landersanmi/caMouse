@@ -8,12 +8,11 @@ from tkinter import filedialog
 import pandas as pd
 import random
 import pickle
-
-
-
 import matplotlib
 import matplotlib.pyplot as plt
+
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+
 
 class DataCollectorController:
     
@@ -107,7 +106,6 @@ class DataCollectorController:
         
         return frame, landmarks_coordinates_normalized, landmarks_raw
 
-
     def add_cam(self):
         try:
             camera_id = int(self.view.config_frame.cam_id_var.get())
@@ -142,7 +140,6 @@ class DataCollectorController:
 
     def update_secs(self):
         self.model.record_time = int(self.config_frame.secs_var)
-
 
     def record_data(self):
         self.model.is_recording = True

@@ -1,12 +1,10 @@
 from src.graph.graph import ActionGraph
 
-
 graph = ActionGraph("base")
 
 print(graph)
 
 print(graph.nodes)
-
 print(graph.nodes[0])
 print(graph.nodes[1])
 
