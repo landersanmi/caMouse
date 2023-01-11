@@ -37,11 +37,11 @@ class MouseController:
             Direction : Tuple (float, float) Represents (x,y) direction
         """
         x, y = pyautogui.position()
-        print(f"Moving to {(x+direction[0], y+direction[1])}")
+        #print(f"Moving to {(x+direction[0], y+direction[1])}")
         pyautogui.move(direction[0], -direction[1])
 
     def apply_state(self, action):
-        print(f"Applying state {action}")
+        #print(f"Applying state {action}")
         
         #TODO Remove unused checks if movable state is removed
         if action == Gesture.NONE.value:

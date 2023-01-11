@@ -25,8 +25,8 @@ class HandDetectionController:
             return None
         
         direction = (
-            int(6000*(self.prev_position[5, 0] - hand_model[5, 0])),
-            int(6000*(self.prev_position[5, 1] - hand_model[5, 1]))
+            int(7000*(self.prev_position[5, 0] - hand_model[5, 0])),
+            int(7000*(self.prev_position[5, 1] - hand_model[5, 1]))
         )
         self.prev_position = hand_model
         
@@ -36,13 +36,13 @@ class HandDetectionController:
         if not self.is_active() or hand_model_normalized is None:
             return
         
-        print("-----------")
+        #print("-----------")
         # TODO Maybe add the frame to hand detector here
         action, _ = self.model(hand_model_normalized)
-        print(f"Got action {action}")
+        #print(f"Got action {action}")
 
         state = self.action_graph.step(action)
-        print(f"Moving to state {state}")
+        #print(f"Moving to state {state}")
 
         self.mouse.apply_state(state)
         if self.action_graph.is_currently_moveable():
@@ -52,4 +52,5 @@ class HandDetectionController:
                 try:
                     self.mouse.move_mouse(direction)
                 except:
-                    print("Not possible move")
+                    pass
+                    #print("Not possible move")

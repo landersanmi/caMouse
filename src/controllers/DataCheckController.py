@@ -141,7 +141,9 @@ class DataCheckController:
                     self.model.hand_cords_expanded, 
                     self.model.hand_real_coords)
             
-                self.save_step(self.model.hand_cords_expanded, action)
+                #coordinates = [x for sublist in self.model.hand_real_coords for x in sublist]
+
+                #self.save_step(coordinates, action)
         
 
     def get_hand(self, tridimensional = False):
@@ -196,6 +198,7 @@ class DataCheckController:
 
                 self.mpDraw.draw_landmarks(frame, handslms, self.mpHands.HAND_CONNECTIONS)
                 
+                '''
                 cv2.circle(frame, (int(200+new_dots2[0][0]*400), int(200+400*new_dots2[0][1])), 1, (255,255,0),2)
                 cv2.circle(frame, (int(200+new_dots2[5][0]*400), int(200+400*new_dots2[5][1])), 1, (255,0,255),2)
                 cv2.circle(frame, (int(200+new_dots2[17][0]*400), int(200+400*new_dots2[17][1])), 1, (255,127, 127),2)
@@ -221,16 +224,16 @@ class DataCheckController:
                     if i in [0, 5, 17]:
                         continue
                     cv2.circle(frame, (int(300+dot[0]*400), int(300+400*dot[1])), 1, (255,0,0),2)
-
+                '''
                 
                 if len(x) != 0: 
                     if self.model.plot_toogle:
-                        
+                        '''
                         plot = self.generate_3D_plot(x, y, z)
                         tk_hand_image = ImageTk.PhotoImage(Image.fromarray(plot))
                         self.view.plot.configure(image=tk_hand_image)
                         self.view.plot.image = tk_hand_image
-                        
+                        '''
         else:
             self.model.hand_cords = None      
         self.model.frame = frame
